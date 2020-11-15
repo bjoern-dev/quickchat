@@ -3,11 +3,11 @@ package de.bjoernstolper.quickchat;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+
 @SpringBootTest
-class QuickchatApplicationTests {
+public class QuickchatApplicationIT {
 
     @Test
-    void contextLoads() {
+    public void contextLoads() {
     }
-
 }

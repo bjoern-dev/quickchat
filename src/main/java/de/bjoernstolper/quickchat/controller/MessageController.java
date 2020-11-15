@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/messages")
+@RequestMapping("/messages/")
 public class MessageController {
 
     private MessageService messageService;
@@ -27,6 +27,7 @@ public class MessageController {
 
     @PostMapping
     public Mono<ResponseEntity<Message>> addMessage(@RequestBody Message message) {
+        message.setId(null);    //prevent IDs from outside
         return messageService.create(message)
                 .map(m -> ResponseEntity
                         .created(URI.create("/messages/" + m.getId()))
@@ -34,7 +35,7 @@ public class MessageController {
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.CONFLICT).build());
     }
 
-    @GetMapping(path = "/", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Message> getMessageStream() {
         return messageService.getAll();
     }
