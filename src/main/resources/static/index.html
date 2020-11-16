@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Profile notification client
+    </title>
+</head>
+<body>
+<script>
+
+    let eventSource = new EventSource("/messages/sse-endpoint/");
+
+    eventSource.onmessage = function(event) {
+        console.log("Message received!");
+        console.log("New message", event.data);
+    };
+    eventSource.addEventListener('heartbeat', event => {
+        console.log("Heartbeat: ", JSON.parse(event.data).comment);
+    });
+    eventSource.onerror = function(error) {
+        console.log("State: ", eventSource.readyState);
+        if(eventSource.readyState === EventSource.CLOSED) {
+            console.log("Connection has been closed");
+        }
+        console.log("Some Error occured: " + error);
+        console.log(error);
+
+    }
+
+</script>
+</body>

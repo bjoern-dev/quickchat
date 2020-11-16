@@ -17,7 +17,7 @@ import java.net.URI;
 import java.time.Duration;
 
 @RestController
-@RequestMapping("/messages/")
+@RequestMapping("/messages")
 public class MessageController {
 
     private MessageService messageService;
@@ -26,7 +26,7 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @PostMapping
+    @PostMapping("/")
     public Mono<ResponseEntity<Message>> addMessage(@RequestBody Message message) {
         message.setId(null);    //prevent IDs from outside. TODO: Refactor to not use Message here. For Simplicity we use it for retrieval of username
         return messageService.create(message)
@@ -36,14 +36,14 @@ public class MessageController {
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.CONFLICT).build());
     }
 
-    @GetMapping
+    @GetMapping("/sse-endpoint/")
     public Flux<ServerSentEvent<Message>> getMessageStream() {
         return messageService.getAll()
                 .map(sequence -> ServerSentEvent.<Message>builder()
                         .id(String.valueOf(sequence.hashCode()))
                         .event("message")
                         .data(sequence)
-                        .retry(Duration.ofMillis(3000))
+                        .retry(Duration.ofMillis(10000))
                         .build());
     }
 
