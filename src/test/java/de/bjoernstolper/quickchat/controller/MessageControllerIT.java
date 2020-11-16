@@ -93,7 +93,7 @@ public class MessageControllerIT {
         Message messageB = new Message(new ObjectId(), "Tom", "Tom sagt auch hi");
         given(messageService.getAll()).willReturn(Flux.just(messageA, messageB));
 
-        List<Message> messages = client.get().uri("/messages/")
+        List<Message> messages = client.get().uri("/messages/sse-endpoint/")
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .exchange()
                 .expectStatus().isOk()

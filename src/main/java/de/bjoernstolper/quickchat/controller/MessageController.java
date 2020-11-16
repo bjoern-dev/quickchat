@@ -8,6 +8,7 @@ import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -20,7 +21,7 @@ import java.time.Duration;
 @RequestMapping("/messages")
 public class MessageController {
 
-    private MessageService messageService;
+    private final MessageService messageService;
 
     public MessageController(MessageService messageService) {
         this.messageService = messageService;
@@ -37,13 +38,32 @@ public class MessageController {
     }
 
     @GetMapping("/sse-endpoint/")
-    public Flux<ServerSentEvent<Message>> getMessageStream() {
-        return messageService.getAll()
+    public Flux<ServerSentEvent<Message>> getMessageStream(@RequestHeader(name = "Last-Event-ID", required = false) String lastEventId) {
+        Flux<Message> allMessages = messageService.getAll();
+
+        //in case client had disconnect, continue at last given ID
+        if (lastEventId != null)
+            allMessages = allMessages.skipUntil(message -> String.valueOf(message.hashCode()).equals(lastEventId)).skip(1);
+
+        return allMessages
+                        .map(sequence -> ServerSentEvent.<Message>builder()
+                                .id(String.valueOf(sequence.hashCode()))
+                                .data(sequence)
+                                .retry(Duration.ofMillis(10000))
+                                .build());
+    }
+
+    @GetMapping("/sse-endpoint/with-heartbeat/")
+    public Flux<ServerSentEvent<Message>> getMessageStreamWithHeartbeat() {
+        return Flux.merge(heartbeatStream(), getMessageStream(null));
+    }
+
+    private Flux<ServerSentEvent<Message>> heartbeatStream() {
+        return Flux.interval(Duration.ofSeconds(2))
                 .map(sequence -> ServerSentEvent.<Message>builder()
-                        .id(String.valueOf(sequence.hashCode()))
-                        .event("message")
-                        .data(sequence)
-                        .retry(Duration.ofMillis(10000))
+                        .event("heartbeat")
+                        .comment("heartbeat")
+                        .data(null)
                         .build());
     }
 
