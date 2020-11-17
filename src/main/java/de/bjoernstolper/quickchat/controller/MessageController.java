@@ -3,6 +3,7 @@ package de.bjoernstolper.quickchat.controller;
 import de.bjoernstolper.quickchat.model.Message;
 import de.bjoernstolper.quickchat.service.MessageService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,9 +38,14 @@ public class MessageController {
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.CONFLICT).build());
     }
 
+    @GetMapping(path="/", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Message> getMessageStream() {
+        return messageService.getAll();
+    }
+
     @GetMapping("/sse-endpoint/")
-    public Flux<ServerSentEvent<Message>> getMessageStream(@RequestHeader(name = "Last-Event-ID", required = false) String lastEventId) {
-        Flux<Message> allMessages = messageService.getAll();
+    public Flux<ServerSentEvent<Message>> getMessageHotStream(@RequestHeader(name = "Last-Event-ID", required = false) String lastEventId) {
+        Flux<Message> allMessages = messageService.getAllAsHotStream();
 
         //in case client had disconnect, continue at last given ID
         if (lastEventId != null)
@@ -55,7 +61,7 @@ public class MessageController {
 
     @GetMapping("/sse-endpoint/with-heartbeat/")
     public Flux<ServerSentEvent<Message>> getMessageStreamWithHeartbeat() {
-        return Flux.merge(heartbeatStream(), getMessageStream(null));
+        return Flux.merge(heartbeatStream(), getMessageHotStream(null));
     }
 
     private Flux<ServerSentEvent<Message>> heartbeatStream() {

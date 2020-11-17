@@ -91,7 +91,7 @@ public class MessageControllerIT {
         //given
         Message messageA = new Message(new ObjectId(), "Max", "Max sagt hi");
         Message messageB = new Message(new ObjectId(), "Tom", "Tom sagt auch hi");
-        given(messageService.getAll()).willReturn(Flux.just(messageA, messageB));
+        given(messageService.getAllAsHotStream()).willReturn(Flux.just(messageA, messageB));
 
         List<Message> messages = client.get().uri("/messages/sse-endpoint/")
                 .accept(MediaType.TEXT_EVENT_STREAM)

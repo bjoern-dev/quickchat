@@ -41,7 +41,7 @@ public class MessageServiceIT {
                 .saveAll(Flux.just( idlessMessage("Max", "Hallo zusammen"),
                         idlessMessage("Donald", "Hi everyone"),
                         idlessMessage("Pierre", "Salut")));
-        Flux<Message> emittedMessages = service.getAll().thenMany(savedMessages);
+        Flux<Message> emittedMessages = service.getAllAsHotStream().thenMany(savedMessages);
         Predicate<Message> matchPredicate = message -> savedMessages.any(savedMessage -> savedMessage.equals(message)).block();
 
         StepVerifier

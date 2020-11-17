@@ -13,12 +13,14 @@ import reactor.core.publisher.Mono;
 @Log4j2
 public class MessageService {
 
-    private final ApplicationEventPublisher publisher;
     private final MessageRepository messageRepository;
 
-    MessageService(ApplicationEventPublisher publisher, MessageRepository messageRepository) {
-        this.publisher = publisher;
+    MessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
+    }
+
+    public Flux<Message> getAllAsHotStream() {
+        return this.messageRepository.findWithTailableCursorBy();
     }
 
     public Flux<Message> getAll() {
@@ -27,7 +29,6 @@ public class MessageService {
 
     public Mono<Message> create(Message message) {
         return this.messageRepository
-                .save(message)
-                .doOnSuccess(m -> this.publisher.publishEvent(new MessageCreatedEvent(m)));
+                .save(message);
     }
 }
