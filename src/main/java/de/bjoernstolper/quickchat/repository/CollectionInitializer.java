@@ -29,10 +29,9 @@ public class CollectionInitializer implements ApplicationListener<ApplicationRea
 
         messageRepository
                 .saveAll(
-                        Flux
-                                .just("Max", "Tom", "John", "Peter")
-                                .map(name -> new Message(null, name, "Hallo ich bin " + name))
-                                .flatMap(messageRepository::save)
+                    Flux
+                        .just("Max", "Tom", "John", "Peter")
+                        .map(name -> new Message(name, "Hallo ich bin " + name))
                 )
                 .thenMany(messageRepository.findAll())
                 .subscribe(message -> log.info("saving " + message.toString()));

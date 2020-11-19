@@ -1,5 +1,6 @@
 package de.bjoernstolper.quickchat.controller;
 
+import de.bjoernstolper.quickchat.model.ClientSentMessage;
 import de.bjoernstolper.quickchat.model.Message;
 import de.bjoernstolper.quickchat.service.MessageService;
 import org.springframework.http.HttpStatus;
@@ -29,9 +30,8 @@ public class MessageController {
     }
 
     @PostMapping("/")
-    public Mono<ResponseEntity<Message>> addMessage(@RequestBody Message message) {
-        message.setId(null);    //prevent IDs from outside. TODO: Refactor to not use Message here. For Simplicity we use it for retrieval of username
-        return messageService.create(message)
+    public Mono<ResponseEntity<Message>> addMessage(@RequestBody ClientSentMessage clientSentMessage) {
+        return messageService.create(clientSentMessage.toMessage())
                 .map(m -> ResponseEntity
                         .created(URI.create("/messages/" + m.getId()))
                         .body(m))
@@ -39,7 +39,7 @@ public class MessageController {
     }
 
     @GetMapping(path="/", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Message> getMessageStream() {
+    public Flux<Message> getMessageColdStream() {
         return messageService.getAll();
     }
 
@@ -48,8 +48,9 @@ public class MessageController {
         Flux<Message> allMessages = messageService.getAllAsHotStream();
 
         //in case client had disconnect, continue at last given ID
-        if (lastEventId != null)
+        if (lastEventId != null) {
             allMessages = allMessages.skipUntil(message -> String.valueOf(message.hashCode()).equals(lastEventId)).skip(1);
+        }
 
         return allMessages
                         .map(sequence -> ServerSentEvent.<Message>builder()

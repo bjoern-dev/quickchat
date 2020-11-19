@@ -1,9 +1,7 @@
 package de.bjoernstolper.quickchat.service;
 
-import de.bjoernstolper.quickchat.event.MessageCreatedEvent;
 import de.bjoernstolper.quickchat.model.Message;
 import de.bjoernstolper.quickchat.repository.MessageRepository;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;

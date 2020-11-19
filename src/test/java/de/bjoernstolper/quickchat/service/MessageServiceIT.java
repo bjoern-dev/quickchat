@@ -38,9 +38,9 @@ public class MessageServiceIT {
     @Disabled("Some weird concurrency behaviour with test class running indefinately if more than one test is active")
     public void getAll() {
         Flux<Message> savedMessages = repository
-                .saveAll(Flux.just( idlessMessage("Max", "Hallo zusammen"),
-                        idlessMessage("Donald", "Hi everyone"),
-                        idlessMessage("Pierre", "Salut")));
+                .saveAll(Flux.just( new Message("Max", "Hallo zusammen"),
+                        new Message("Donald", "Hi everyone"),
+                        new Message("Pierre", "Salut")));
         Flux<Message> emittedMessages = service.getAllAsHotStream().thenMany(savedMessages);
         Predicate<Message> matchPredicate = message -> savedMessages.any(savedMessage -> savedMessage.equals(message)).block();
 
@@ -54,14 +54,10 @@ public class MessageServiceIT {
 
     @Test
     public void createOneEntryAndCheckId() {
-        Mono<Message> messageMono = service.create(idlessMessage("Tom", "Hi Jerry"));
+        Mono<Message> messageMono = service.create(new Message("Tom", "Hi Jerry"));
         StepVerifier
                 .create(messageMono)
                 .expectNextMatches(savedMessage -> StringUtils.hasText(savedMessage.getId().toString()))
                 .verifyComplete();
-    }
-
-    private Message idlessMessage(String username, String text) {
-        return new Message(null, username, text);
     }
 }
