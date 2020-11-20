@@ -39,7 +39,7 @@
     document.getElementById('chat-form').onsubmit = function (evt) {
         evt.preventDefault();
         const inputField = document.getElementById('chat-input');
-        let chatMessage = inputField.value;
+        let chatMessage = strip(inputField.value);
         inputField.value = '';
 
         fetch('/messages/', {
@@ -65,7 +65,7 @@
 
         console.log("Message received!");
         console.log("New message", message);
-        li.innerHTML = message.username + ': ' + message.text;
+        li.innerHTML = message.username + ': ' + strip(message.text);
         chat.appendChild(li);
     };
     eventSource.addEventListener('heartbeat', event => {
@@ -79,6 +79,11 @@
         console.log("Some Error occured: " + error);
         console.log(error);
 
+    }
+
+    function strip(html){
+        let doc = new DOMParser().parseFromString(html, 'text/html');
+        return doc.body.textContent || "";
     }
 </script>
 </body>
