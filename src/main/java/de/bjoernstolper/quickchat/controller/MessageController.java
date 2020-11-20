@@ -53,11 +53,11 @@ public class MessageController {
         }
 
         return allMessages
-                        .map(sequence -> ServerSentEvent.<Message>builder()
-                                .id(String.valueOf(sequence.hashCode()))
-                                .data(sequence)
-                                .retry(Duration.ofMillis(10000))
-                                .build());
+                .map(sequence -> ServerSentEvent.<Message>builder()
+                        .id(String.valueOf(sequence.hashCode()))
+                        .data(sequence)
+                        .retry(Duration.ofMillis(10000))
+                        .build());
     }
 
     @GetMapping("/sse-endpoint/with-heartbeat/")

@@ -1,18 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="utf-8">
-    <title>Profile notification client
-    </title>
+    <title>Quickchat using SSE and hot streams</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Acme&display=swap" rel="stylesheet">
 </head>
 <body>
+<h1 style="font-family: 'Acme', sans-serif;">Quickchat</h1>
+<ul id="messages"></ul>
+<input type="text" size="20" disabled value="" id="myusername"/>
+<form action="/" method="post" id="chat-form">
+    <input type="text" size="40" id="chat-input"/>
+    <input type="submit" value="Absenden" />
+</form>
 <script>
+    let username = '';
+    const usernameField = document.getElementById('myusername');
+    /*****      Username        ********/
+    fetch('https://namey.muffinlabs.com/name.json?count=1&with_surname=false&frequency=common', {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(res=>res.json())
+        .then(res => {console.log(res);
+            usernameField.value = res[0];
+            username = res[0]
+        })
+        .catch((error) => {
+            username = 'Tom';
+            usernameField.value = 'Tom';
+        });
 
-    let eventSource = new EventSource("/messages/sse-endpoint/");
+    /*****       Chat input      ******/
+    document.getElementById('chat-form').onsubmit = function (evt) {
+        evt.preventDefault();
+        const inputField = document.getElementById('chat-input');
+        let chatMessage = inputField.value;
+        inputField.value = '';
+
+        fetch('/messages/', {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({username: username, text: chatMessage})
+        })
+            .then(res=>res.json())
+            .then(res => console.log('Sent a message and got this response from server: ', res));
+    }
+
+    /*****       Message Display      ******/
+
+    const chat = document.getElementById('messages');
+    const eventSource = new EventSource("/messages/sse-endpoint/");
 
     eventSource.onmessage = function(event) {
+        const message = JSON.parse(event.data);
+        const li = document.createElement('li');
+
         console.log("Message received!");
-        console.log("New message", event.data);
+        console.log("New message", message);
+        li.innerHTML = message.username + ': ' + message.text;
+        chat.appendChild(li);
     };
     eventSource.addEventListener('heartbeat', event => {
         console.log("Heartbeat: ", JSON.parse(event.data).comment);
@@ -26,6 +80,5 @@
         console.log(error);
 
     }
-
 </script>
 </body>
