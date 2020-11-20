@@ -1,5 +1,12 @@
 # Quickchat
 
+#### Demo
+Chat ist deployt unter https://quickchat-reactive.herokuapp.com/ 
+
+Das System ist bei Inaktivität im Sleep-Modus, es dauert dann beim ersten Aufruf ca. 20 Sekunden, bis es reagiert
+
+___
+
 #### Aufbaubeschreibung
 Ein Beispielprojekt für die Nutzung von Reactive Hot Streams mit einem reactive Stack (Spring WebFlux, Spring Data Reactive, Server Sent Events (SSE), JavaScript EventSource).
 
