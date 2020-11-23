@@ -16,12 +16,12 @@
     color: white;
     height: 15vh;
     max-height: 70px;
-    display: flex;
+    display: grid;
     align-items: center;
+    grid-template-columns: 3% 1fr 3%;
 }
 .chat__logo {
     font-family: 'Acme', sans-serif;
-    margin: 0 0 0 3%;
 }
 .chat__frame {
     display: grid;
@@ -84,12 +84,11 @@
     left: auto;
 }
 
-.chat__input {
-
-}
-
 @media (min-width: 768px) {
     .chat__frame {
+        grid-template-columns: minmax(70px, 10%) 1fr minmax(70px, 10%);
+    }
+    .chat__header {
         grid-template-columns: minmax(70px, 10%) 1fr minmax(70px, 10%);
     }
     .chat-input__username-display {
@@ -106,6 +105,9 @@
 }
 @media (min-width: 1200px) {
     .chat__frame {
+        grid-template-columns: minmax(70px, 20%) 1fr minmax(70px, 20%);
+    }
+    .chat__header {
         grid-template-columns: minmax(70px, 20%) 1fr minmax(70px, 20%);
     }
 }
