@@ -28,9 +28,9 @@ Mit _@DataMongoTest_ wird die Datenbankschicht als Slice hochgefahren und das Zu
 ___
 
 #### Frontend
-Das "Frontend" besteht aus einer einzigen statischen HTML-Seite mit integriertem vanilla JavaScript (ES6).
+Das "Frontend" besteht aus einer einzigen statischen HTML-Seite und hinzugeladenem CSS und JS (vanilla ES6).
 
 Zum Verbinden mit den Streaming-Endpoints wird die EventSource-API benutzt. Diese hält im Falle der Hot-Streams die Verbindung zum REST-Server offen und erhält direkt neue Chat-Nachrichten sobald diese eintreffen.
-Da SSE im Gegensatz zu Websockets nur unidirektional sind (dafür um einiges schlanker), wird für das Versenden von Chat-Nachrichten ein normaler POST-Request über die fetch-API verwndet. 
+Da SSE im Gegensatz zu Websockets nur unidirektional sind (dafür um einiges schlanker), wird für das Versenden von Chat-Nachrichten ein normaler POST-Request über die fetch-API verwendet. 
 
 Ebenfalls per fetch ist eine Random-username API angebunden.  
