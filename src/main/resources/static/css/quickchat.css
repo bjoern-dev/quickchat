@@ -22,6 +22,7 @@
 }
 .chat__logo {
     font-family: 'Acme', sans-serif;
+    margin: 0;
 }
 .chat__frame {
     display: grid;
@@ -43,6 +44,9 @@
     margin-block-start: 0;
     margin-block-end: 50px;
     list-style-type: none;
+}
+.chat__message-wrapper {
+    overflow-y: auto;
 }
 .chat__message {
     color: #000;
@@ -83,6 +87,16 @@
     right: -10px;
     left: auto;
 }
+.chat__message-time {
+    display: inline-block;
+    float: right;
+    padding: 0 0 0 7px;
+    position: relative;
+    bottom: -4px;
+    color: rgba(0, 0, 0, .45);
+    font-size: 11px;
+}
+
 
 @media (min-width: 768px) {
     .chat__frame {
